@@ -11,7 +11,7 @@ request = request.defaults({
         'Connection': 'keep-alive',
         'Cache-Control': 'max-age=0',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Origin': 'http://flro.org',
+        'Origin': 'http://filelist.ro',
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'en-US,en;q=0.8,ro;q=0.6'
@@ -43,7 +43,7 @@ var ask_cmd = function() {
 }
 
 var check_login = function() {
-    request('http://flro.org/my.php', function(err, response, body) {
+    request('http://filelist.ro/my.php', function(err, response, body) {
         if ('/login.php' == response.request.uri.path) {
             console.log('Not logged in');
         } else {
@@ -74,9 +74,9 @@ var ask_login = function() {
 
 var login = function(usr, pwd) {
     request.post({
-        url: 'http://flro.org/takelogin.php',
+        url: 'http://filelist.ro/takelogin.php',
         headers: {
-            'Referer': 'http://flro.org/login.php'
+            'Referer': 'http://filelist.ro/login.php'
         },
         form: {
             username: usr,
@@ -97,9 +97,9 @@ var cheerio = require('cheerio');
 var torrents;
 var search = function(query) {
     request({
-        url: 'http://flro.org/browse.php',
+        url: 'http://filelist.ro/browse.php',
         headers: {
-            'Referer': 'http://flro.org/browse.php'
+            'Referer': 'http://filelist.ro/browse.php'
         },
         qs: {
             search: query,
@@ -124,7 +124,7 @@ var search = function(query) {
             var path = $('.torrenttable:nth-child(3) a', item).attr('href');
             torrents.push({
                 title: title,
-                url: 'http://flro.org/' + path
+                url: 'http://filelist.ro/' + path
             });
         });
 
