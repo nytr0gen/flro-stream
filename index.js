@@ -2,10 +2,18 @@
 
 var request = require('request');
 var prompt = require('prompt');
-
+var fs = require('fs');
+var cheerio = require('cheerio');
 var FileCookieStore = require('tough-cookie-filestore');
+var exec = require('child_process').exec;
+
+if (!fs.existsSync('cookies.json')) {
+    fs.writeFileSync('cookies.json', '');
+}
+
+var j = request.jar(new FileCookieStore('cookies.json'));
 request = request.defaults({
-    jar: request.jar(new FileCookieStore('cookies.json')),
+    jar: j,
     gzip: true,
     headers: {
         'Connection': 'keep-alive',
@@ -38,6 +46,9 @@ var ask_cmd = function() {
             case 'play':
                 play();
                 break;
+            default:
+                console.log('That is no command of mine');
+                ask_cmd();
         }
     });
 }
@@ -57,12 +68,8 @@ var check_login = function() {
 var ask_login = function() {
     var schema = {
         properties: {
-            username: {
-                required: true
-            },
-            password: {
-                hidden: true
-            }
+            username: {required: true},
+            password: {hidden: true}
         }
     };
 
@@ -80,7 +87,8 @@ var login = function(usr, pwd) {
         },
         form: {
             username: usr,
-            password: pwd
+            password: pwd,
+            unlock: '1'
         }
     }, function(err, response, body) {
         if (body == '') {
@@ -93,7 +101,6 @@ var login = function(usr, pwd) {
     });
 };
 
-var cheerio = require('cheerio');
 var torrents;
 var search = function(query) {
     request({
@@ -118,6 +125,7 @@ var search = function(query) {
             var seed  = $('.torrenttable:nth-child(9)', item).text();
             var peer  = $('.torrenttable:nth-child(10)', item).text();
 
+            key++;
             console.log(key + '. ' + title);
             console.log('> ' + cat + ' | ' + size + ' | ' + date + ' | ' + seed + '/' + peer);
 
@@ -132,18 +140,17 @@ var search = function(query) {
     });
 };
 
-var fs = require('fs');
-var download = function(idx) {
+var download = function(key) {
+    key--;
     var file = fs.createWriteStream('movie.torrent');
-    request(torrents[idx].url, function() {
-        console.log(torrents[idx].title + ' was successfully downloaded as movie.torrent');
+    request(torrents[key].url, function() {
+        console.log(torrents[key].title + ' was successfully downloaded as movie.torrent');
         console.log('peerflix movie.torrent -v -- --fullscreen');
 
         ask_cmd();
     }).pipe(file);
 };
 
-var exec = require('child_process').exec;
 var play = function() {
     var cmd = 'peerflix movie.torrent -v -- --fullscreen';
     exec(cmd, function(error, stdout, stderr) {

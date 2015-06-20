@@ -28,5 +28,7 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
 cookies.json
 movie.torrent
+.DS_Store
