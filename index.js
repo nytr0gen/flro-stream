@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 var request = require('request');
 var prompt = require('prompt');
 var fs = require('fs');
@@ -29,22 +28,29 @@ request = request.defaults({
 var ask_cmd = function() {
     prompt.start();
     prompt.get(['cmd'], function (err, result) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
         var cmd = result.cmd.split(' ');
         switch (cmd[0]) {
-            case 'check-login':
+            case 'check-login': case 'check': case 'c':
                 check_login();
                 break;
-            case 'login':
+            case 'login': case 'l':
                 ask_login();
                 break;
-            case 'search':
+            case 'search': case 's':
                 search(cmd.slice(1).join(' '));
                 break;
-            case 'download':
+            case 'download': case 'd':
                 download(cmd[1]);
                 break;
-            case 'play':
+            case 'play': case 'p':
                 play();
+                break;
+            case 'quit': case 'q':
                 break;
             default:
                 console.log('That is no command of mine');
@@ -158,6 +164,5 @@ var play = function() {
         ask_cmd();
     });
 }
-
 
 ask_cmd();
