@@ -142,6 +142,7 @@ var search = function(query) {
             });
         });
 
+        console.log("Finished showing %d torrent files", torrents.length)
         ask_cmd();
     });
 };
