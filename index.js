@@ -149,12 +149,21 @@ var search = function(query) {
 var download = function(key) {
     key--;
     var file = fs.createWriteStream('movie.torrent');
-    request(torrents[key].url, function() {
-        console.log(torrents[key].title + ' was successfully downloaded as movie.torrent');
-        console.log('peerflix movie.torrent -v -- --fullscreen');
+    request(torrents[key].url)
+        .on('end', function() {
+            console.log(torrents[key].title + ' downloading was successful as movie.torrent');
+            console.log('peerflix movie.torrent -v -- --fullscreen');
 
-        ask_cmd();
-    }).pipe(file);
+            ask_cmd();
+        })
+        .on('error', function(err) {
+            console.err(torrents[key].title + ' downloading has failed');
+            console.err('Please try again');
+            console.err(err);
+
+            ask_cmd();
+        })
+        .pipe(file);
 };
 
 var play = function() {
